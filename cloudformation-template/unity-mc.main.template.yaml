@@ -342,16 +342,34 @@ Resources:
               group: ubuntu
               mode: "000644"
               owner: ubuntu
-          packages:
-            apt:
-              docker.io: []
-              git: []
           services:
             systemd:
               docker:
                 enabled: true
                 ensureRunning: true
           commands:
+            00_apt_update:
+              command: |
+                set -ex
+                retries=5
+                count=0
+                until [ $count -ge $retries ]
+                do
+                  apt-get update && break
+                  count=$((count+1))
+                  sleep 10
+                done
+            001_install_packages:
+              command: |
+                set -ex
+                retries=5
+                count=0
+                until [ $count -ge $retries ]
+                do
+                  apt-get install -y docker.io git && break
+                  count=$((count+1))
+                  sleep 10
+                done
             01_install_eksctl:
               command: !Sub |
                 set -ex \
